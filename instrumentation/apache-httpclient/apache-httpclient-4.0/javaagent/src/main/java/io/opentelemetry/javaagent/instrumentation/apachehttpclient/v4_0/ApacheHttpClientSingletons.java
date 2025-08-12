@@ -6,6 +6,7 @@
 package io.opentelemetry.javaagent.instrumentation.apachehttpclient.v4_0;
 
 import io.opentelemetry.instrumentation.api.instrumenter.Instrumenter;
+import io.opentelemetry.instrumentation.api.instrumenter.InstrumenterBuilder;
 import io.opentelemetry.javaagent.bootstrap.internal.JavaagentHttpClientInstrumenters;
 import org.apache.http.HttpResponse;
 
@@ -15,11 +16,16 @@ public final class ApacheHttpClientSingletons {
   private static final Instrumenter<ApacheHttpClientRequest, HttpResponse> INSTRUMENTER;
 
   static {
-    INSTRUMENTER =
+    InstrumenterBuilder<ApacheHttpClientRequest, HttpResponse> builder =
         JavaagentHttpClientInstrumenters.create(
             INSTRUMENTATION_NAME,
             new ApacheHttpClientHttpAttributesGetter(),
             HttpHeaderSetter.INSTANCE);
+    
+    // Add the HTTP entity recorder for capturing request/response bodies
+    builder.addAttributesExtractor(new HttpEntityRecorder());
+    
+    INSTRUMENTER = builder.build();
   }
 
   public static Instrumenter<ApacheHttpClientRequest, HttpResponse> instrumenter() {

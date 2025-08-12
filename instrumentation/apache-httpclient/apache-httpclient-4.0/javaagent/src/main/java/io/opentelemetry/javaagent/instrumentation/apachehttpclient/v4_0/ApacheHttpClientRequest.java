@@ -120,4 +120,14 @@ public final class ApacheHttpClientRequest {
       return null;
     }
   }
+
+  /**
+   * Get the underlying HttpRequest delegate for accessing entity data.
+   * This method is package-private and should only be used by instrumentation code.
+   * 
+   * @return the underlying HttpRequest
+   */
+  HttpRequest getDelegate() {
+    return delegate;
+  }
 }
